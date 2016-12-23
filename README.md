@@ -12,4 +12,8 @@ Icon Ping - visual ping to 8.8.8.8, based on [antirez/iconping](https://github.c
 
 The code is mostly a copy of [Ping-indicator by trifonovkv](https://extensions.gnome.org/extension/923/ping-indicator/)
 
-![ ](http://bttfhvitalia.altervista.org/iconping_example_gnome.png)
+![ ](http://bttfhvitalia.altervista.org/iconping_gnome1.png)
+
+![ ](http://bttfhvitalia.altervista.org/iconping_gnome3.png)
+
+![ ](http://bttfhvitalia.altervista.org/iconping_gnome2.png)
