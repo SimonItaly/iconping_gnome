@@ -1,0 +1,4 @@
+{"shell-version": ["3.14.4"],
+"uuid": "iconping@simonebisi.it",
+"name": "IconPing for Gnome",
+"description": "Icon Ping - visual ping to 8.8.8.8, based on antirez/iconping for macOS"}

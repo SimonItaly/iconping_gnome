@@ -1,0 +1,31 @@
+
+.helloworld-label {
+    font-size: 36px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: rgba(10,10,10,0.7);
+    border-radius: 5px;
+    padding: .5em;
+}
+
+.iconok {
+    background-image: url("icons/iconok.png");
+    background-size: 16px;
+    height: 16px;
+    width: 16px;
+}
+
+.iconslow {
+    background-image: url("icons/iconslow.png");
+    background-size: 16px;
+    height: 16px;
+    width: 16px;
+}
+
+.iconko {
+    background-image: url("icons/iconko.png");
+    background-size: 16px;
+    height: 16px;
+    width: 16px;
+}
+
