@@ -1,17 +1,13 @@
 
 const St = imports.gi.St;
 const Main = imports.ui.main;
-const Clutter = imports.gi.Clutter;
 const PanelMenu = imports.ui.panelMenu;
-const PopupMenu = imports.ui.popupMenu;
 const Lang = imports.lang;
 const GLib = imports.gi.GLib;
 const Mainloop = imports.mainloop;
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Util = imports.misc.util;
 
 let button;
+let status = 1;
 
 const PingMenuButton = new Lang.Class(
 {
@@ -29,46 +25,53 @@ const PingMenuButton = new Lang.Class(
                           y_fill: false,
                           track_hover: true });                     
 
-		let icon = new St.Icon({style_class: 'iconok'})
-		button.set_child(icon);
-
-        /*
-        let item;
-        
-        item = new PopupMenu.PopupMenuItem(_("Update time:"));
-        this.menu.addMenuItem(item);
-        
-        item = new PopupMenu.PopupMenuItem(_("1 second"));
-        item.connect('activate', Lang.bind(this, this._onPreferencesActivate));
-        this.menu.addMenuItem(item);
-        
-        item = new PopupMenu.PopupMenuItem(_("5 second"));
-        item.connect('activate', Lang.bind(this, this._onPreferencesActivate));
-        this.menu.addMenuItem(item);
-        
-        item = new PopupMenu.PopupMenuItem(_("30 second"));
-        item.connect('activate', Lang.bind(this, this._onPreferencesActivate));
-        this.menu.addMenuItem(item);
-        
-        item = new PopupMenu.PopupMenuItem(_("Exit"));
-        item.connect('activate', Lang.bind(this, this._onPreferencesActivate));
-        this.menu.addMenuItem(item);
-        */
+		this.createPingIcon('icon');
 
         this._refresh();
     },
 
-    _loadConfig: function()
+	/*
+		Still not working
+	*/
+    toggleState: function()
     {
+        if(status)
+        {
+            //this.createPingIcon('icon');
+            
+            //this._timeout = undefined;
 
+            //Main.notify(_("Iconping disabled"));
+            status = 0;
+        }
+        else
+        {
+            //this.createPingIcon('iconok');
+            
+            //this._refresh();
+            
+            //this._timeout = Mainloop.timeout_add_seconds(1,
+            //    Lang.bind(this, this._refresh));
+
+            //Main.notify(_("Iconping enabled"));
+            status = 1;
+        }
     },
 
-    _onPreferencesActivate: function()
+	/*
+		Create the icon	
+	*/
+    createPingIcon: function(name)
     {
-		log("_onPreferencesActivate");
-        return 0;
+        let icon = new St.Icon({style_class: name});
+        button.set_child(icon);
+
+        //button.connect('button-press-event', this.toggleState);
     },
 
+	/*
+		Ping magic stolen from another extension
+	*/
     _loadData: function()
     {
         this.command = ["ping", "-c 1", "8.8.8.8"];
@@ -112,6 +115,9 @@ const PingMenuButton = new Lang.Class(
         );
     },
 
+	/*
+		Handle correct response -> green/yellow icon
+	*/
     _loadPipeOUT: function(channel, condition, data)
     {
         if (condition != GLib.IOCondition.HUP)
@@ -122,36 +128,37 @@ const PingMenuButton = new Lang.Class(
 
             if(result != null)
             {
-            	let icon;
-            	
             	var ping = parseFloat(result[1]);
             	if(ping >= 300.0)
             	{
-            		icon = new St.Icon({style_class: 'iconslow'});	
+                    this.createPingIcon('iconslow');
             	}
             	else
             	{
-            		icon = new St.Icon({style_class: 'iconok'});
+                    this.createPingIcon('iconok');
             	}
-            	
-            	button.set_child(icon);
         	}
         }
         GLib.source_remove(this.tagWatchOUT);
         channel.shutdown(true);
     },
 
+	/*
+		Handling network error -> red icon
+	*/
     _loadPipeERR: function(channel, condition, data)
     {
         if (condition != GLib.IOCondition.HUP)
         {
-            let icon = new St.Icon({style_class: 'iconko'});
-            button.set_child(icon);
+            this.createPingIcon('iconko');
         }
         GLib.source_remove(this.tagWatchERR);
         channel.shutdown(false);
     },
 
+	/*
+		Timer
+	*/
     _refresh: function()
     {
         this._removeTimeout();
@@ -161,11 +168,12 @@ const PingMenuButton = new Lang.Class(
         }
         else
         {
-            let icon = new St.Icon({style_class: 'iconko'});
-            button.set_child(icon);
+            this.createPingIcon('iconko');
         }
+
         this._timeout = Mainloop.timeout_add_seconds(5,
             Lang.bind(this, this._refresh));
+
         return true;
     },
 
