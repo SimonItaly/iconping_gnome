@@ -5,9 +5,16 @@ const PanelMenu = imports.ui.panelMenu;
 const Lang = imports.lang;
 const GLib = imports.gi.GLib;
 const Mainloop = imports.mainloop;
+const ExtensionUtils = imports.misc.extensionUtils;
+const Me = ExtensionUtils.getCurrentExtension();
+const Convenience = Me.imports.convenience;
 
 let button;
 let status = 1;
+
+const ICONPING_SETTINGS_SCHEMA = 'org.gnome.shell.extensions.iconping';
+const PING_DESTINATION = 'ping-destination';
+const REFRESH_INTERVAL = 'refresh-interval';
 
 const PingMenuButton = new Lang.Class(
 {
@@ -27,6 +34,11 @@ const PingMenuButton = new Lang.Class(
 
 		this.createPingIcon('icon');
 
+        this._settings = Convenience.getSettings(ICONPING_SETTINGS_SCHEMA);
+        this._settingsC = this._settings.connect("changed", Lang.bind(this, function() {
+          this._loadConfig();
+        }));
+        this._loadConfig();
         this._refresh();
     },
 
@@ -69,12 +81,20 @@ const PingMenuButton = new Lang.Class(
         //button.connect('button-press-event', this.toggleState);
     },
 
+    /*
+         (re) load settings from gconf
+     */
+    _loadConfig: function() {
+        this._pingDestination = this._settings.get_string(PING_DESTINATION);
+        this._pingInterval = this._settings.get_int(REFRESH_INTERVAL);
+    },
+
 	/*
 		Ping magic stolen from another extension
 	*/
     _loadData: function()
     {
-        this.command = ["ping", "-c 1", "8.8.8.8"];
+        this.command = ["ping", "-c 1", this._pingDestination];
         [success, this.child_pid, this.std_in, this.std_out, this.std_err] =
         GLib.spawn_async_with_pipes(
             null, 
@@ -171,7 +191,7 @@ const PingMenuButton = new Lang.Class(
             this.createPingIcon('iconko');
         }
 
-        this._timeout = Mainloop.timeout_add_seconds(5,
+        this._timeout = Mainloop.timeout_add_seconds(this._pingInterval,
             Lang.bind(this, this._refresh));
 
         return true;
@@ -189,6 +209,10 @@ const PingMenuButton = new Lang.Class(
     stop: function()
     {
         this._removeTimeout();
+        if (this._settingsC) {
+            this._settings.disconnect(this._settingsC);
+            this._settingsC = undefined;
+        }
         this.menu.removeAll();
     }
 })
