@@ -1,4 +1,11 @@
-{"shell-version": ["3.14.4"],
-"uuid": "iconping@simonebisi.it",
-"name": "IconPing (dev) for Gnome",
-"description": "Icon Ping - visual ping to 8.8.8.8, based on antirez/iconping for macOS"}
+{
+  "description": "Icon Ping - visual ping to 8.8.8.8, based on antirez/iconping for macOS\nhttps://github.com/SimonItaly/iconping_gnome\n\nThanks to:\nhttps://github.com/antirez/iconping (idea and original work for macOS)\nhttps://github.com/JocelynDelalande (added options menu)\nhttps://github.com/mgafner (fixed warnings)", 
+  "name": "IconPing for Gnome", 
+  "shell-version": [
+	"3.22.3",
+	"3.30.1"
+  ], 
+  "url": "https://github.com/SimonItaly/iconping_gnome", 
+  "uuid": "iconping@simonebisi.it", 
+  "version": 3
+}
