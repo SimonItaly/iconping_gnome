@@ -1,3 +1,26 @@
+/* 
+ * Iconping GNOME Shell extension
+ *
+ * Author: Simone Bisi <https://github.com/SimonItaly>
+ *
+ * Thanks to:
+ * 		https://github.com/antirez/iconping (idea and original work for macOS)
+ * 		https://github.com/JocelynDelalande (added options menu)
+ * 		https://github.com/mgafner (fixed warnings)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 const St = imports.gi.St;
 const Main = imports.ui.main;
@@ -8,6 +31,8 @@ const Mainloop = imports.mainloop;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
+const PopupMenu = imports.ui.popupMenu;
+const MessageTray = imports.ui.messageTray;
 
 let button;
 let status = 1;
@@ -40,33 +65,38 @@ const PingMenuButton = new Lang.Class(
         }));
         this._loadConfig();
         this._refresh();
+
+		button.reactive = true;
+		button.connect('button-release-event', this.toggleState);
+
+		global.log('[iconPing] Iconping init');
     },
 
 	/*
-		Still not working
+		Toggle iconping
 	*/
     toggleState: function()
     {
         if(status)
         {
-            //this.createPingIcon('icon');
-            
-            //this._timeout = undefined;
+            let icon = new St.Icon({style_class: 'icon'});
+        	button.set_child(icon);
 
-            //Main.notify(_("Iconping disabled"));
+            stop();
+
             status = 0;
+            notify("Iconping", "Iconping disabled", 'media-playback-pause');
+
+			global.log('[iconping] Iconping disabled');
         }
         else
         {
-            //this.createPingIcon('iconok');
-            
-            //this._refresh();
-            
-            //this._timeout = Mainloop.timeout_add_seconds(1,
-            //    Lang.bind(this, this._refresh));
+			start();
 
-            //Main.notify(_("Iconping enabled"));
             status = 1;
+            notify("Iconping", "Iconping enabled", 'media-playback-start');
+
+			global.log('[iconping] Iconping enabled');
         }
     },
 
@@ -77,8 +107,6 @@ const PingMenuButton = new Lang.Class(
     {
         let icon = new St.Icon({style_class: name});
         button.set_child(icon);
-
-        //button.connect('button-press-event', this.toggleState);
     },
 
     /*
@@ -229,3 +257,27 @@ function disable()
     pingMenu.stop();
     pingMenu.destroy();
 }
+
+/*
+	There's probably a more elegant way for the toggle function,
+	but here's a quick and dirty fix 
+*/
+
+function start() {
+	pingMenu._refresh();
+}
+
+function stop() {
+	pingMenu._removeTimeout();
+}
+
+//==============================================================================
+
+function notify(msg, details, icon) {
+    let source = new MessageTray.Source("MyApp Information", icon);
+    Main.messageTray.add(source);
+    let notification = new MessageTray.Notification(source, msg, details);
+    notification.setTransient(true);
+    source.notify(notification);
+}
+
