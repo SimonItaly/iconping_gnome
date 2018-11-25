@@ -1,5 +1,8 @@
 # ![][logo] IconPing for Gnome
 [logo]: http://bttfhvitalia.altervista.org/world_icon.png " "
+
+[Available on GNOME Shell Extensions](https://extensions.gnome.org/extension/1155/iconping-for-gnome)
+
 Icon Ping - visual ping to 8.8.8.8, based on [antirez/iconping](https://github.com/antirez/iconping) for macOS:
 
 > Many times I end using a computer in places with a poor or erratic wifi connection, so while I'm surfing the web, checking my email, or writing a message on Twitter, if something does not work as expected I'm not sure if the problem is my internet connection or a specific web site.
